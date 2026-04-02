@@ -82,7 +82,9 @@ export default function AssetNavigation({ assets, activeView, isUnlocked, select
       {Object.entries(grouped).map(([category, catAssets]) => (
         <div key={category} className="mb-4">
           <div className="px-4 mb-1">
-            <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest">
+            <span className={`text-[10px] font-semibold uppercase tracking-widest ${
+              isEnhancedMode ? 'text-white/30' : 'text-zinc-400'
+            }`}>
               {category}
             </span>
           </div>
@@ -96,12 +98,16 @@ export default function AssetNavigation({ assets, activeView, isUnlocked, select
                     onClick={() => onSelect(asset.id)}
                     className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors group ${
                       isActive
-                        ? 'bg-slate-900 text-white'
-                        : 'text-slate-600 hover:bg-zinc-100 hover:text-slate-800'
+                        ? isEnhancedMode
+                          ? 'bg-slate-700 text-white'
+                          : 'bg-slate-900 text-white'
+                        : isEnhancedMode
+                          ? 'text-white/60 hover:bg-slate-800 hover:text-white'
+                          : 'text-slate-600 hover:bg-zinc-100 hover:text-slate-800'
                     }`}
                   >
                     <span className={`shrink-0 transition-colors ${
-                      isActive ? 'text-white/50' : 'text-zinc-300 group-hover:text-zinc-400'
+                      isActive ? 'text-white/50' : isEnhancedMode ? 'text-white/30 group-hover:text-white/50' : 'text-zinc-300 group-hover:text-zinc-400'
                     }`}>
                       {TYPE_ICONS[asset.type] || TYPE_ICONS.embed}
                     </span>
