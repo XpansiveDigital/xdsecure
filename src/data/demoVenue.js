@@ -2,7 +2,7 @@
 // TODO: Replace with API call to backend (e.g. GET /api/guides/:id) when backend is ready.
 
 export const demoVenue = {
-  guideName: "Venue Guide 2024",
+  guideName: "Venue Guide 2026",
   venueName: "The Grand Assembly Rooms",
   description:
     "A curated guide to The Grand Assembly Rooms — presenting everything you need to explore the space, understand the layout, and plan your event.",
