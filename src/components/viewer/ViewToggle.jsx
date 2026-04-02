@@ -1,8 +1,13 @@
-// ViewToggle: Sales View / Secure View tab switcher shown in the viewer header.
+// ViewToggle: Sales View / Secure View tab switcher.
+// Adapts to dark header when Secure View is unlocked.
 
 export default function ViewToggle({ activeView, onViewChange, isUnlocked }) {
+  const dark = activeView === 'secure' && isUnlocked
+
   return (
-    <div className="flex items-center gap-0.5 bg-zinc-100 rounded-xl p-1">
+    <div className={`flex items-center gap-0.5 rounded-xl p-1 transition-colors duration-300 ${
+      dark ? 'bg-slate-800' : 'bg-zinc-100'
+    }`}>
 
       {/* Sales View */}
       <button
@@ -10,7 +15,9 @@ export default function ViewToggle({ activeView, onViewChange, isUnlocked }) {
         className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
           activeView === 'sales'
             ? 'bg-white text-slate-900 shadow-sm'
-            : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
+            : dark
+              ? 'text-white/60 hover:text-white hover:bg-slate-700'
+              : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
         }`}
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -24,10 +31,12 @@ export default function ViewToggle({ activeView, onViewChange, isUnlocked }) {
         onClick={() => onViewChange('secure')}
         className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
           activeView === 'secure'
-            ? isUnlocked
-              ? 'bg-slate-900 text-white shadow-sm'
+            ? dark
+              ? 'bg-slate-600 text-white shadow-sm'
               : 'bg-white text-slate-900 shadow-sm'
-            : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
+            : dark
+              ? 'text-white/60 hover:text-white hover:bg-slate-700'
+              : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
         }`}
       >
         {isUnlocked && activeView === 'secure' ? (
