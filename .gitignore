@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Claude Code internal files
+.claude/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+*.local
