@@ -7,7 +7,7 @@ export const demoVenue = {
   description:
     "A curated guide to The Grand Assembly Rooms — presenting everything you need to explore the space, understand the layout, and plan your event.",
   // TODO: Hash this before persisting. Replace with token-based access when backend is ready.
-  accessCode: "venue2024",
+  accessCode: "venue2026",
   assets: [
     {
       id: "1",
