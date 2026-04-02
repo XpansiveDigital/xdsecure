@@ -32,6 +32,12 @@ export default function ViewerPanel({ guide }) {
   const showAccessGate = activeView === 'secure' && !isUnlocked
   const isEnhancedMode = activeView === 'secure' && isUnlocked
 
+  // Switching to Sales View always resets unlock so the toggle feels like a real mode switch
+  function handleViewChange(view) {
+    setActiveView(view)
+    if (view === 'sales') setIsUnlocked(false)
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]">
 
@@ -64,21 +70,10 @@ export default function ViewerPanel({ guide }) {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-3 shrink-0">
-            {isEnhancedMode && (
-              <button
-                onClick={() => { setIsUnlocked(false); setActiveView('sales') }}
-                className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 font-medium transition"
-              >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
-                Sales View
-              </button>
-            )}
+          <div className="flex items-center shrink-0">
             <ViewToggle
               activeView={activeView}
-              onViewChange={setActiveView}
+              onViewChange={handleViewChange}
               isUnlocked={isUnlocked}
             />
           </div>
