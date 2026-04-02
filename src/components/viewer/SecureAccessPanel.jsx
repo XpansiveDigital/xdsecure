@@ -37,12 +37,16 @@ export default function SecureAccessPanel({ correctPassword, onUnlock }) {
 
       <div className="relative w-full max-w-sm">
 
-        {/* Icon */}
+        {/* Lock icon — large and prominent */}
         <div className="flex justify-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-white/8 border border-white/12 flex items-center justify-center backdrop-blur-sm">
-            <svg className="w-6 h-6 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
-            </svg>
+          <div className="relative">
+            {/* Soft glow behind the icon */}
+            <div className="absolute inset-0 rounded-full bg-white/5 blur-2xl scale-150" />
+            <div className="relative w-24 h-24 rounded-3xl bg-white/6 border border-white/10 flex items-center justify-center">
+              <svg className="w-12 h-12 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.25}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+            </div>
           </div>
         </div>
 
@@ -62,10 +66,10 @@ export default function SecureAccessPanel({ correctPassword, onUnlock }) {
               value={input}
               onChange={(e) => { setInput(e.target.value); setError(false) }}
               placeholder="Access code"
-              className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-white/25 focus:outline-none focus:ring-2 transition pr-10 bg-white/8 text-white ${
+              className={`w-full rounded-xl border px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 transition pr-10 bg-slate-800 ${
                 error
-                  ? 'border-red-400/50 focus:ring-red-400/50'
-                  : 'border-white/12 focus:ring-white/20 focus:border-white/25'
+                  ? 'border-red-500/60 focus:ring-red-500/40'
+                  : 'border-slate-700 focus:ring-white/20 focus:border-slate-500'
               }`}
               autoFocus
             />

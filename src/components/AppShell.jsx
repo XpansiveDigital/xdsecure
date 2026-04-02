@@ -34,22 +34,36 @@ export default function AppShell() {
 
           {/* Tab nav — centred */}
           <nav className="flex items-center gap-0.5 bg-zinc-100 rounded-xl p-1">
-            {[
-              { id: 'viewer', label: 'Published Guide' },
-              { id: 'builder', label: 'Guide Builder' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  activeTab === tab.id
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+            {/* Published Guide tab — shows the active venue name */}
+            <button
+              onClick={() => setActiveTab('viewer')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all duration-150 ${
+                activeTab === 'viewer'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
+              }`}
+            >
+              <span className="text-sm font-medium">Published Guide</span>
+              {guide.venueName && (
+                <span className={`text-xs font-normal truncate max-w-[140px] ${
+                  activeTab === 'viewer' ? 'text-zinc-400' : 'text-zinc-400'
+                }`}>
+                  — {guide.venueName}
+                </span>
+              )}
+            </button>
+
+            {/* Guide Builder tab */}
+            <button
+              onClick={() => setActiveTab('builder')}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                activeTab === 'builder'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
+              }`}
+            >
+              Guide Builder
+            </button>
           </nav>
 
           {/* Right: status pill */}
