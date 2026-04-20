@@ -1,18 +1,16 @@
 import { useState } from 'react'
 
-// SecureAccessPanel: gated access moment before Enhanced View is unlocked.
-// Presents the access code prompt with appropriate positioning language.
-// TODO: Replace local check with API call (e.g. POST /api/guides/:id/authenticate)
-//       that returns a short-lived session token stored in state.
+// SecureAccessPanel: gated access screen shown before Vetted View is unlocked.
+// TODO: Replace local password check with POST /api/guides/:id/authenticate
+//       that returns a short-lived session token.
 
-export default function SecureAccessPanel({ correctPassword, onUnlock }) {
-  const [input, setInput] = useState('')
-  const [error, setError] = useState(false)
+export default function SecureAccessPanel({ correctPassword, accessCodeHint, onUnlock }) {
+  const [input,    setInput]    = useState('')
+  const [error,    setError]    = useState(false)
   const [showCode, setShowCode] = useState(false)
 
   function handleSubmit(e) {
     e.preventDefault()
-    // TODO: Replace direct string comparison with backend auth when available.
     if (input === correctPassword) {
       setError(false)
       onUnlock()
@@ -23,27 +21,30 @@ export default function SecureAccessPanel({ correctPassword, onUnlock }) {
   }
 
   return (
-    // Full-area gate screen — dark gradient background signals elevated context
-    <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8">
+    <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8 relative overflow-hidden">
 
-      {/* Subtle dot-grid overlay */}
+      {/* Dot-grid overlay */}
       <div
-        className="absolute inset-0 opacity-[0.04]"
+        className="absolute inset-0 opacity-[0.035]"
         style={{
           backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
           backgroundSize: '28px 28px',
         }}
       />
 
+      {/* Radial glow */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="w-96 h-96 rounded-full bg-white/3 blur-3xl" />
+      </div>
+
       <div className="relative w-full max-w-sm">
 
-        {/* Lock icon — large and prominent */}
+        {/* Lock icon */}
         <div className="flex justify-center mb-8">
           <div className="relative">
-            {/* Soft glow behind the icon */}
-            <div className="absolute inset-0 rounded-full bg-white/5 blur-2xl scale-150" />
-            <div className="relative w-24 h-24 rounded-3xl bg-white/6 border border-white/10 flex items-center justify-center">
-              <svg className="w-12 h-12 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.25}>
+            <div className="absolute inset-0 rounded-full bg-white/8 blur-2xl scale-[2]" />
+            <div className="relative w-20 h-20 rounded-3xl bg-white/6 border border-white/10 flex items-center justify-center backdrop-blur-sm">
+              <svg className="w-10 h-10 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.25}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
               </svg>
             </div>
@@ -54,8 +55,8 @@ export default function SecureAccessPanel({ correctPassword, onUnlock }) {
         <h2 className="text-center text-xl font-semibold text-white mb-2 tracking-tight">
           Additional Detail Available
         </h2>
-        <p className="text-center text-sm text-white/45 mb-8 leading-relaxed">
-          Access more detailed layouts and information, typically shared with qualified clients and partners.
+        <p className="text-center text-sm text-white/40 mb-8 leading-relaxed px-4">
+          Access more detailed venue information shared selectively with qualified clients and partners.
         </p>
 
         {/* Form */}
@@ -64,19 +65,19 @@ export default function SecureAccessPanel({ correctPassword, onUnlock }) {
             <input
               type={showCode ? 'text' : 'password'}
               value={input}
-              onChange={(e) => { setInput(e.target.value); setError(false) }}
-              placeholder="Access code"
-              className={`w-full rounded-xl border px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 transition pr-10 bg-slate-800 ${
-                error
-                  ? 'border-red-500/60 focus:ring-red-500/40'
-                  : 'border-slate-700 focus:ring-white/20 focus:border-slate-500'
-              }`}
+              onChange={e => { setInput(e.target.value); setError(false) }}
+              placeholder="Enter access code"
               autoFocus
+              className={`w-full rounded-xl border px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 transition pr-11 bg-slate-800/80 backdrop-blur-sm ${
+                error
+                  ? 'border-red-500/50 focus:ring-red-500/30'
+                  : 'border-slate-700 focus:ring-white/15 focus:border-slate-600'
+              }`}
             />
             <button
               type="button"
-              onClick={() => setShowCode((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition"
+              onClick={() => setShowCode(s => !s)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/55 transition p-0.5"
             >
               {showCode ? (
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -93,21 +94,21 @@ export default function SecureAccessPanel({ correctPassword, onUnlock }) {
 
           {error && (
             <p className="text-xs text-red-400/80 text-center">
-              That code doesn't match. Please check and try again.
+              That code doesn't match — please try again.
             </p>
           )}
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-white text-slate-900 text-sm font-semibold hover:bg-white/90 transition shadow-lg shadow-black/30"
+            className="w-full py-3.5 rounded-xl bg-white text-slate-900 text-sm font-semibold hover:bg-white/90 active:scale-[0.98] transition shadow-lg shadow-black/20"
           >
-            Enter Access Code
+            Access Vetted View
           </button>
         </form>
 
-        {/* Footer note */}
-        <p className="text-center text-xs text-white/25 mt-6">
-          Don't have an access code? Contact your venue representative.
+        {/* Footer */}
+        <p className="text-center text-xs text-white/22 mt-6 leading-relaxed">
+          {accessCodeHint || "Don't have an access code? Contact your venue representative."}
         </p>
 
       </div>
