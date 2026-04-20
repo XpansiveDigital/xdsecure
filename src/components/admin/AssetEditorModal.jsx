@@ -38,12 +38,16 @@ const VIS_STYLES = {
   vetted: { active: 'border-amber-400 bg-amber-50 ring-1 ring-amber-300',   label: 'text-amber-800' },
 }
 
-export default function AssetEditorModal({ asset, onSave, onCancel }) {
+export default function AssetEditorModal({ asset, prefillCategory, onSave, onCancel }) {
   const [form, setForm] = useState(emptyAsset)
 
   useEffect(() => {
-    setForm(asset ? { ...emptyAsset, ...asset } : { ...emptyAsset })
-  }, [asset])
+    if (asset) {
+      setForm({ ...emptyAsset, ...asset })
+    } else {
+      setForm({ ...emptyAsset, category: prefillCategory || emptyAsset.category })
+    }
+  }, [asset, prefillCategory])
 
   function set(field, value) {
     setForm(f => ({ ...f, [field]: value }))
