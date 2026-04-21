@@ -1,24 +1,24 @@
 import { getSections, getSectionOrder, TYPE_CONFIG, VISIBILITY_CONFIG } from '../../lib/guideUtils'
 
 // ─── Visibility cycle ─────────────────────────────────────────────────────────
-const VIS_CYCLE = ['both', 'sales', 'vetted']
+const VIS_CYCLE = ['public', 'private', 'internal']
 
 // ─── Section visibility breakdown ────────────────────────────────────────────
 
 function sectionBreakdown(assets) {
-  const both       = assets.filter(a => a.visibility === 'both').length
-  const salesOnly  = assets.filter(a => a.visibility === 'sales').length
-  const vettedOnly = assets.filter(a => a.visibility === 'vetted').length
-  const salesTotal = both + salesOnly
-  const parts      = []
-  if (salesTotal  > 0) parts.push({ label: `${salesTotal} Sales`,  cls: 'text-sky-600'   })
-  if (vettedOnly  > 0) parts.push({ label: `${vettedOnly} Vetted`, cls: 'text-amber-600' })
+  const pub  = assets.filter(a => a.visibility === 'public').length
+  const priv = assets.filter(a => a.visibility === 'private').length
+  const int  = assets.filter(a => a.visibility === 'internal').length
+  const parts = []
+  if (pub  > 0) parts.push({ label: `${pub} Public`,    cls: 'text-sky-600'   })
+  if (priv > 0) parts.push({ label: `${priv} Private`,  cls: 'text-amber-600' })
+  if (int  > 0) parts.push({ label: `${int} Internal`,  cls: 'text-red-600'   })
   return parts
 }
 
 function sectionViewWarning(assets) {
-  const salesTotal = assets.filter(a => a.visibility === 'both' || a.visibility === 'sales').length
-  if (salesTotal === 0) return 'Hidden from Sales View'
+  const publicCount = assets.filter(a => a.visibility === 'public').length
+  if (publicCount === 0) return 'Not visible in Public View'
   return null
 }
 
@@ -74,8 +74,9 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
   }
 
   // ── Structure preview data ──
-  const salesAssets  = guide.assets.filter(a => a.visibility === 'both' || a.visibility === 'sales')
-  const vettedAssets = guide.assets.filter(a => a.visibility === 'vetted')
+  const publicAssets   = guide.assets.filter(a => a.visibility === 'public')
+  const privateAssets  = guide.assets.filter(a => a.visibility === 'private')
+  const internalAssets = guide.assets.filter(a => a.visibility === 'internal')
   const featuredAssets = guide.assets.filter(a => a.featured)
 
   function groupedForPreview(assets) {
@@ -94,8 +95,9 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
     return result
   }
 
-  const salesSections  = groupedForPreview(salesAssets)
-  const vettedSections = groupedForPreview(vettedAssets)
+  const publicSections   = groupedForPreview(publicAssets)
+  const privateSections  = groupedForPreview(privateAssets)
+  const internalSections = groupedForPreview(internalAssets)
 
   return (
     <div className="h-full flex overflow-hidden">
@@ -205,7 +207,7 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
                     {/* Asset rows */}
                     {section.assets.map((asset, aIdx) => {
                       const tc            = TYPE_CONFIG[asset.type] || TYPE_CONFIG.link
-                      const vc            = VISIBILITY_CONFIG[asset.visibility] || VISIBILITY_CONFIG.both
+                      const vc            = VISIBILITY_CONFIG[asset.visibility] || VISIBILITY_CONFIG.public
                       const isFirstInSec  = aIdx === 0
                       const isLastInSec   = aIdx === section.assets.length - 1
 
@@ -304,29 +306,27 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
           <p className="text-[11px] text-zinc-400 mt-1">Reflects current configuration.</p>
         </div>
 
-        <div className="flex-1 px-5 py-5 space-y-6 overflow-y-auto">
+        <div className="flex-1 px-5 py-5 space-y-6 overflow-y-auto scrollbar-thin">
 
-          {/* Sales View */}
+          {/* Public layer */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-sky-400" />
-                <span className="text-xs font-bold text-slate-700">Sales View</span>
+                <span className="text-xs font-bold text-slate-700">Public</span>
               </div>
               <span className="text-[10px] font-medium text-sky-600 ml-auto bg-sky-50 border border-sky-200 rounded-full px-2 py-0.5">
-                {salesAssets.length} asset{salesAssets.length !== 1 ? 's' : ''}
+                {publicAssets.length} asset{publicAssets.length !== 1 ? 's' : ''}
               </span>
             </div>
-            {salesSections.length === 0 ? (
-              <p className="text-xs text-zinc-400 italic pl-3.5">No assets assigned to Sales View</p>
+            {publicSections.length === 0 ? (
+              <p className="text-xs text-zinc-400 italic pl-3.5">No public assets configured</p>
             ) : (
               <div className="space-y-3">
-                {salesSections.map(s => (
+                {publicSections.map(s => (
                   <div key={s.category}>
                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1 pl-3.5">{s.category}</p>
-                    {s.assets.map(a => (
-                      <PreviewRow key={a.id} asset={a} />
-                    ))}
+                    {s.assets.map(a => <PreviewRow key={a.id} asset={a} />)}
                   </div>
                 ))}
               </div>
@@ -334,36 +334,55 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
           </div>
 
           {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-zinc-100" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-white px-2 text-[10px] text-zinc-400 font-medium">Vetted access only</span>
-            </div>
-          </div>
+          <PreviewDivider label="Private access only" />
 
-          {/* Vetted View */}
+          {/* Private layer */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-amber-400" />
-                <span className="text-xs font-bold text-slate-700">Additional (Vetted)</span>
+                <span className="text-xs font-bold text-slate-700">Private</span>
               </div>
               <span className="text-[10px] font-medium text-amber-700 ml-auto bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
-                +{vettedAssets.length}
+                +{privateAssets.length}
               </span>
             </div>
-            {vettedSections.length === 0 ? (
-              <p className="text-xs text-zinc-400 italic pl-3.5">No vetted-only assets configured</p>
+            {privateSections.length === 0 ? (
+              <p className="text-xs text-zinc-400 italic pl-3.5">No private-only assets configured</p>
             ) : (
               <div className="space-y-3">
-                {vettedSections.map(s => (
+                {privateSections.map(s => (
                   <div key={s.category}>
                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1 pl-3.5">{s.category}</p>
-                    {s.assets.map(a => (
-                      <PreviewRow key={a.id} asset={a} amber />
-                    ))}
+                    {s.assets.map(a => <PreviewRow key={a.id} asset={a} amber />)}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Divider */}
+          <PreviewDivider label="Internal only" />
+
+          {/* Internal layer */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-red-400" />
+                <span className="text-xs font-bold text-slate-700">Internal</span>
+              </div>
+              <span className="text-[10px] font-medium text-red-700 ml-auto bg-red-50 border border-red-200 rounded-full px-2 py-0.5">
+                +{internalAssets.length}
+              </span>
+            </div>
+            {internalSections.length === 0 ? (
+              <p className="text-xs text-zinc-400 italic pl-3.5">No internal-only assets configured</p>
+            ) : (
+              <div className="space-y-3">
+                {internalSections.map(s => (
+                  <div key={s.category}>
+                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1 pl-3.5">{s.category}</p>
+                    {s.assets.map(a => <PreviewRow key={a.id} asset={a} red />)}
                   </div>
                 ))}
               </div>
@@ -376,10 +395,11 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
         <div className="px-5 py-4 border-t border-zinc-100 bg-zinc-50/50">
           <div className="space-y-1.5">
             {[
-              { label: 'Sales View total',  val: salesAssets.length  },
-              { label: 'Vetted View total', val: salesAssets.length + vettedAssets.length },
-              { label: 'Featured',          val: featuredAssets.length },
-              { label: 'Sections',          val: sections.length },
+              { label: 'Public layer',    val: publicAssets.length   },
+              { label: 'Private layer',   val: privateAssets.length  },
+              { label: 'Internal layer',  val: internalAssets.length },
+              { label: 'Featured',        val: featuredAssets.length },
+              { label: 'Sections',        val: sections.length       },
             ].map(r => (
               <div key={r.label} className="flex justify-between text-[11px]">
                 <span className="text-zinc-400">{r.label}</span>
@@ -394,10 +414,24 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
   )
 }
 
+// ─── Preview divider ─────────────────────────────────────────────────────────
+
+function PreviewDivider({ label }) {
+  return (
+    <div className="flex items-center gap-2 -mx-5 px-5 py-2 bg-zinc-50 border-y border-zinc-100">
+      <svg className="w-3 h-3 text-zinc-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+      </svg>
+      <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">{label}</span>
+    </div>
+  )
+}
+
 // ─── Preview row ──────────────────────────────────────────────────────────────
 
-function PreviewRow({ asset, amber }) {
+function PreviewRow({ asset, amber, red }) {
   const tc = TYPE_CONFIG[asset.type] || TYPE_CONFIG.link
+  const textCls = red ? 'text-red-700' : amber ? 'text-amber-700' : 'text-slate-600'
   return (
     <div className="flex items-center gap-2 pl-3.5 py-1">
       {asset.featured ? (
@@ -408,7 +442,7 @@ function PreviewRow({ asset, amber }) {
         <div className="w-2.5 h-2.5 shrink-0" />
       )}
       <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${tc.dot}`} />
-      <span className={`text-xs truncate ${amber ? 'text-amber-700' : 'text-slate-600'}`}>
+      <span className={`text-xs truncate ${textCls}`}>
         {asset.name}
       </span>
     </div>

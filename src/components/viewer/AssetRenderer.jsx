@@ -1,6 +1,9 @@
 import { TYPE_CONFIG } from '../../lib/guideUtils'
 
 // AssetRenderer: renders the selected asset in the main viewer panel.
+// Props:
+//   asset — the selected asset object
+//   layer — 'public' | 'private' | 'internal'
 
 function OpenTabFallback({ url }) {
   return (
@@ -74,7 +77,13 @@ function renderContent(asset) {
   }
 }
 
-export default function AssetRenderer({ asset, isSecureMode }) {
+// Visibility badge config
+const VIS_BADGE = {
+  private:  { label: 'Private',  cls: 'text-amber-700 bg-amber-50 border-amber-200/80' },
+  internal: { label: 'Internal', cls: 'text-red-700 bg-red-50 border-red-200/80' },
+}
+
+export default function AssetRenderer({ asset, layer }) {
   if (!asset) {
     return (
       <div className="flex-1 flex items-center justify-center p-8 bg-stone-50">
@@ -91,8 +100,10 @@ export default function AssetRenderer({ asset, isSecureMode }) {
     )
   }
 
-  const isVetted = asset.visibility === 'vetted'
-  const tc = TYPE_CONFIG[asset.type] || TYPE_CONFIG.link
+  const tc      = TYPE_CONFIG[asset.type] || TYPE_CONFIG.link
+  const visBadge = VIS_BADGE[asset.visibility]
+  // Show visibility badge only when viewing a layer where it adds context
+  const showVisBadge = visBadge && (layer === 'private' || layer === 'internal')
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -124,13 +135,13 @@ export default function AssetRenderer({ asset, isSecureMode }) {
               </span>
             )}
 
-            {/* Vetted badge */}
-            {isVetted && isSecureMode && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 rounded-full px-2 py-0.5">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            {/* Visibility badge */}
+            {showVisBadge && (
+              <span className={`inline-flex items-center gap-1 text-[10px] font-semibold border rounded-full px-2 py-0.5 ${visBadge.cls}`}>
+                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                 </svg>
-                Vetted
+                {visBadge.label}
               </span>
             )}
           </div>

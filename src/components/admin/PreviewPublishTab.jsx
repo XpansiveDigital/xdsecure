@@ -11,23 +11,64 @@ function getPublishChecks(guide) {
     { label: 'Venue name set',          ok: !!guide.venueName?.trim()                            },
     { label: 'Assets configured',       ok: assets.length > 0                                    },
     { label: 'All assets have sources', ok: assets.length > 0 && assets.every(a => !!a.url?.trim()) },
-    { label: 'Access code set',         ok: !!guide.accessCode?.trim()                           },
+    { label: 'Private access code set', ok: !!guide.accessCode?.trim()                           },
   ]
+}
+
+// ─── Share link row ───────────────────────────────────────────────────────────
+
+function ShareLinkRow({ label, hint, url, copyKey, copied, onCopy, colorCls, iconPath, lockIcon }) {
+  return (
+    <div>
+      <div className="flex items-center gap-1.5 mb-1">
+        <p className="text-[11px] font-semibold text-slate-600">{label}</p>
+        {lockIcon && (
+          <svg className={`w-2.5 h-2.5 ${colorCls}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+        )}
+      </div>
+      <div className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 ${
+        url ? `bg-zinc-50 border-zinc-200` : 'bg-zinc-50 border-zinc-100 opacity-50'
+      }`}>
+        <svg className={`w-3 h-3 shrink-0 ${url ? colorCls : 'text-zinc-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d={iconPath} />
+        </svg>
+        <span className="flex-1 text-[11px] text-slate-500 truncate font-mono">
+          {url || hint}
+        </span>
+        {url && (
+          <button
+            onClick={() => onCopy(url, copyKey)}
+            className="shrink-0 text-[10px] font-semibold text-zinc-400 hover:text-slate-600 transition"
+          >
+            {copied === copyKey ? 'Copied!' : 'Copy'}
+          </button>
+        )}
+      </div>
+    </div>
+  )
 }
 
 // ─── PreviewPublishTab ────────────────────────────────────────────────────────
 
+const LINK_ICON = "M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+const LOCK_ICON = "M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+
 export default function PreviewPublishTab({ guide, setGuide }) {
   const [copied, setCopied] = useState(null)
 
-  const stats      = getGuideStats(guide)
-  const sections   = getSections(guide)
-  const checks     = getPublishChecks(guide)
-  const allPassed  = checks.every(c => c.ok)
+  const stats    = getGuideStats(guide)
+  const sections = getSections(guide)
+  const checks   = getPublishChecks(guide)
+  const allPassed   = checks.every(c => c.ok)
   const isPublished = guide.publishStatus === 'published'
 
-  const shareLink       = isPublished ? 'venueguide.io/grand-assembly' : null
-  const vettedShareLink = isPublished ? 'venueguide.io/grand-assembly?v=1' : null
+  // Share links — only available when published
+  const base         = isPublished ? 'venueguide.io/grand-assembly' : null
+  const publicLink   = base ? `${base}/public`   : null
+  const privateLink  = base ? `${base}/private`  : null
+  const internalLink = base ? `${base}/internal` : null
 
   function handlePublishToggle() {
     setGuide(g => ({
@@ -56,7 +97,7 @@ export default function PreviewPublishTab({ guide, setGuide }) {
 
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
 
-          {/* Status + publish */}
+          {/* Status + publish button */}
           <div>
             <div className={`flex items-center gap-3 px-4 py-3 rounded-xl mb-3 ${
               isPublished
@@ -94,64 +135,70 @@ export default function PreviewPublishTab({ guide, setGuide }) {
             )}
           </div>
 
-          {/* Share links */}
+          {/* Share links — 3 layers */}
           <div>
             <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-3">Share Links</p>
-            <div className="space-y-2">
-              <div>
-                <p className="text-[11px] font-semibold text-slate-600 mb-1">Sales View</p>
-                <div className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 ${
-                  shareLink ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-50 border-zinc-100 opacity-50'
-                }`}>
-                  <svg className="w-3 h-3 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-                  </svg>
-                  <span className="flex-1 text-[11px] text-slate-500 truncate font-mono">
-                    {shareLink || 'Available when published'}
-                  </span>
-                  {shareLink && (
-                    <button
-                      onClick={() => handleCopy(shareLink, 'sales')}
-                      className="shrink-0 text-[10px] font-semibold text-zinc-400 hover:text-slate-600 transition"
-                    >
-                      {copied === 'sales' ? 'Copied!' : 'Copy'}
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-slate-600 mb-1">Vetted View</p>
-                <div className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 ${
-                  vettedShareLink ? 'bg-amber-50 border-amber-200' : 'bg-zinc-50 border-zinc-100 opacity-50'
-                }`}>
-                  <svg className="w-3 h-3 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                  </svg>
-                  <span className="flex-1 text-[11px] text-slate-500 truncate font-mono">
-                    {vettedShareLink || 'Available when published'}
-                  </span>
-                  {vettedShareLink && (
-                    <button
-                      onClick={() => handleCopy(vettedShareLink, 'vetted')}
-                      className="shrink-0 text-[10px] font-semibold text-zinc-400 hover:text-slate-600 transition"
-                    >
-                      {copied === 'vetted' ? 'Copied!' : 'Copy'}
-                    </button>
-                  )}
-                </div>
-              </div>
+            <div className="space-y-2.5">
+
+              {/* Public */}
+              <ShareLinkRow
+                label="Public View"
+                hint="Available when published"
+                url={publicLink}
+                copyKey="public"
+                copied={copied}
+                onCopy={handleCopy}
+                colorCls="text-sky-500"
+                iconPath={LINK_ICON}
+              />
+
+              {/* Private */}
+              <ShareLinkRow
+                label="Private Access"
+                hint="Available when published"
+                url={privateLink}
+                copyKey="private"
+                copied={copied}
+                onCopy={handleCopy}
+                colorCls="text-amber-500"
+                iconPath={LOCK_ICON}
+                lockIcon
+              />
+
+              {/* Internal */}
+              <ShareLinkRow
+                label="Internal Use Only"
+                hint="Available when published"
+                url={internalLink}
+                copyKey="internal"
+                copied={copied}
+                onCopy={handleCopy}
+                colorCls="text-red-500"
+                iconPath={LOCK_ICON}
+                lockIcon
+              />
+
             </div>
+
+            {isPublished && (
+              <p className="mt-2.5 text-[10px] text-zinc-400 leading-relaxed">
+                Private and Internal links require an access code to unlock.
+              </p>
+            )}
           </div>
 
           {/* Guide summary */}
           <div>
             <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-3">Guide Summary</p>
             <div className="space-y-2">
-              <SummaryRow label="Sales View assets" value={stats.sales} cls="text-sky-600" />
-              <SummaryRow label="Vetted View assets" value={`+${stats.vetted}`} cls="text-amber-600" />
-              <SummaryRow label="Total assets" value={stats.total} />
-              <SummaryRow label="Sections" value={stats.sections} />
-              <SummaryRow label="Featured" value={guide.assets.filter(a => a.featured).length} />
+              <SummaryRow label="Public assets"   value={stats.public}   cls="text-sky-600"   />
+              <SummaryRow label="Private assets"  value={stats.private}  cls="text-amber-600" />
+              <SummaryRow label="Internal assets" value={stats.internal} cls="text-red-600"   />
+              <div className="border-t border-zinc-100 pt-2 mt-2">
+                <SummaryRow label="Total assets" value={stats.total}                        />
+                <SummaryRow label="Sections"     value={stats.sections}                     />
+                <SummaryRow label="Featured"     value={guide.assets.filter(a => a.featured).length} />
+              </div>
             </div>
           </div>
 
@@ -161,15 +208,17 @@ export default function PreviewPublishTab({ guide, setGuide }) {
               <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-3">Sections</p>
               <div className="space-y-1.5">
                 {sections.map(s => {
-                  const salesCount  = s.assets.filter(a => a.visibility === 'both' || a.visibility === 'sales').length
-                  const vettedCount = s.assets.filter(a => a.visibility === 'vetted').length
+                  const pubCount  = s.assets.filter(a => a.visibility === 'public').length
+                  const privCount = s.assets.filter(a => a.visibility === 'private').length
+                  const intCount  = s.assets.filter(a => a.visibility === 'internal').length
                   return (
                     <div key={s.category} className="flex items-center gap-2">
                       <div className="w-1 h-3.5 rounded-full bg-zinc-200 shrink-0" />
                       <span className="text-xs text-slate-600 flex-1 truncate">{s.category}</span>
                       <div className="flex items-center gap-1.5 text-[10px]">
-                        {salesCount  > 0 && <span className="text-sky-500 font-medium">{salesCount}S</span>}
-                        {vettedCount > 0 && <span className="text-amber-500 font-medium">{vettedCount}V</span>}
+                        {pubCount  > 0 && <span className="text-sky-500   font-semibold">{pubCount}Pu</span>}
+                        {privCount > 0 && <span className="text-amber-500 font-semibold">{privCount}Pr</span>}
+                        {intCount  > 0 && <span className="text-red-500   font-semibold">{intCount}In</span>}
                       </div>
                     </div>
                   )

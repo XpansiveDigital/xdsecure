@@ -17,15 +17,16 @@ const ACCENT_COLORS = [
 function getHealthChecks(guide) {
   const assets = guide.assets || []
   const checks = [
-    { label: 'Guide name added',         ok: !!guide.guideName?.trim()                            },
-    { label: 'Venue name added',         ok: !!guide.venueName?.trim()                            },
-    { label: 'Description written',      ok: !!guide.description?.trim()                          },
-    { label: 'At least one asset',       ok: assets.length > 0                                    },
-    { label: 'Access code configured',   ok: !!guide.accessCode?.trim()                           },
-    { label: 'All assets have sources',  ok: assets.length > 0 && assets.every(a => !!a.url?.trim()) },
+    { label: 'Guide name added',             ok: !!guide.guideName?.trim()                            },
+    { label: 'Venue name added',             ok: !!guide.venueName?.trim()                            },
+    { label: 'Description written',          ok: !!guide.description?.trim()                          },
+    { label: 'At least one asset',           ok: assets.length > 0                                    },
+    { label: 'Private access code set',      ok: !!guide.accessCode?.trim()                           },
+    { label: 'All assets have sources',      ok: assets.length > 0 && assets.every(a => !!a.url?.trim()) },
   ]
   const optional = [
-    { label: 'Logo uploaded',            ok: !!guide.logoUrl, note: 'optional' },
+    { label: 'Internal access code set',     ok: !!guide.internalAccessCode?.trim(), note: 'optional' },
+    { label: 'Logo uploaded',                ok: !!guide.logoUrl,                    note: 'optional' },
   ]
   const passed = checks.filter(c => c.ok).length
   return { checks, optional, passed, total: checks.length }
@@ -34,11 +35,13 @@ function getHealthChecks(guide) {
 // ─── Section visibility label ─────────────────────────────────────────────────
 
 function sectionVisLabel(assets) {
-  const vetted = assets.filter(a => a.visibility === 'vetted').length
-  const sales  = assets.filter(a => a.visibility === 'both' || a.visibility === 'sales').length
-  if (vetted === 0) return { label: 'Sales View',    cls: 'text-sky-600'   }
-  if (sales  === 0) return { label: 'Vetted Only',   cls: 'text-amber-600' }
-  return                   { label: 'Mixed',         cls: 'text-zinc-500'  }
+  const priv = assets.filter(a => a.visibility === 'private').length
+  const int  = assets.filter(a => a.visibility === 'internal').length
+  const pub  = assets.filter(a => a.visibility === 'public').length
+  if (int > 0 && pub === 0 && priv === 0) return { label: 'Internal Only', cls: 'text-red-600'  }
+  if (priv > 0 && pub === 0)              return { label: 'Private+',       cls: 'text-amber-600' }
+  if (int > 0 || priv > 0)               return { label: 'Mixed',          cls: 'text-zinc-500'  }
+  return                                         { label: 'Public',         cls: 'text-sky-600'   }
 }
 
 // ─── Shared styles ────────────────────────────────────────────────────────────
@@ -50,8 +53,9 @@ const cardCls  = 'bg-white rounded-2xl border border-zinc-200/70 shadow-[0_1px_2
 // ─── OverviewTab ──────────────────────────────────────────────────────────────
 
 export default function OverviewTab({ guide, setGuide, onNavigate }) {
-  const [showCode, setShowCode] = useState(false)
-  const [saved,    setSaved]    = useState(false)
+  const [showPrivate,  setShowPrivate]  = useState(false)
+  const [showInternal, setShowInternal] = useState(false)
+  const [saved,        setSaved]        = useState(false)
 
   const stats    = getGuideStats(guide)
   const sections = getSections(guide)
@@ -77,7 +81,7 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
   const isPublished = guide.publishStatus === 'published'
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto scrollbar-thin">
       <div className="max-w-5xl mx-auto px-8 py-8">
 
         {/* ── Page header ── */}
@@ -214,51 +218,95 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
             {/* Access Settings */}
             <div className={cardCls}>
               <div className="px-6 pt-5 pb-2">
-                <h2 className="text-sm font-semibold text-slate-800">Vetted Access</h2>
+                <h2 className="text-sm font-semibold text-slate-800">Access Settings</h2>
                 <p className="text-xs text-zinc-400 mt-0.5">
-                  Control who can unlock the Vetted View. Share this code only with qualified clients and partners.
+                  Configure access codes for Private and Internal layers. Share each code only with the intended audience.
                 </p>
               </div>
-              <div className="px-6 pb-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelCls}>Access Code</label>
-                    <div className="relative">
+              <div className="px-6 pb-6 space-y-5">
+
+                {/* Private Access */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                      Private
+                    </span>
+                    <span className="text-xs text-zinc-400">Qualified clients and approved contacts</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Access Code</label>
+                      <div className="relative">
+                        <input
+                          className={`${inputCls} pr-10`}
+                          type={showPrivate ? 'text' : 'password'}
+                          value={guide.accessCode}
+                          onChange={e => update('accessCode', e.target.value)}
+                          placeholder="Set a code..."
+                        />
+                        <button type="button" onClick={() => setShowPrivate(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-slate-600 transition">
+                          <EyeIcon show={showPrivate} />
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelCls}>Code Hint <span className="normal-case font-normal text-zinc-400">(optional)</span></label>
                       <input
-                        className={`${inputCls} pr-10`}
-                        type={showCode ? 'text' : 'password'}
-                        value={guide.accessCode}
-                        onChange={e => update('accessCode', e.target.value)}
-                        placeholder="Set a code..."
+                        className={inputCls}
+                        value={guide.accessCodeHint}
+                        onChange={e => update('accessCodeHint', e.target.value)}
+                        placeholder="e.g. Contact your event manager"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowCode(s => !s)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-slate-600 transition"
-                      >
-                        {showCode
-                          ? <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
-                          : <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        }
-                      </button>
                     </div>
                   </div>
-                  <div>
-                    <label className={labelCls}>Code Hint <span className="normal-case font-normal text-zinc-400">(optional)</span></label>
-                    <input
-                      className={inputCls}
-                      value={guide.accessCodeHint}
-                      onChange={e => update('accessCodeHint', e.target.value)}
-                      placeholder="e.g. Contact your event manager"
-                    />
+                </div>
+
+                <div className="border-t border-zinc-100" />
+
+                {/* Internal Access */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 rounded-full px-2.5 py-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      Internal
+                    </span>
+                    <span className="text-xs text-zinc-400">Authorised team members only</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Internal Code</label>
+                      <div className="relative">
+                        <input
+                          className={`${inputCls} pr-10`}
+                          type={showInternal ? 'text' : 'password'}
+                          value={guide.internalAccessCode || ''}
+                          onChange={e => update('internalAccessCode', e.target.value)}
+                          placeholder="Set a code..."
+                        />
+                        <button type="button" onClick={() => setShowInternal(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-slate-600 transition">
+                          <EyeIcon show={showInternal} />
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelCls}>Code Hint <span className="normal-case font-normal text-zinc-400">(optional)</span></label>
+                      <input
+                        className={inputCls}
+                        value={guide.internalAccessCodeHint || ''}
+                        onChange={e => update('internalAccessCodeHint', e.target.value)}
+                        placeholder="e.g. Team access only"
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 bg-amber-50/60 border border-amber-200/70 rounded-xl px-4 py-3">
-                  <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+
+                <div className="flex items-start gap-3 bg-zinc-50 border border-zinc-200/70 rounded-xl px-4 py-3">
+                  <svg className="w-4 h-4 text-zinc-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
                   </svg>
-                  <p className="text-xs text-amber-800 leading-relaxed">
-                    <strong className="font-semibold">Vetted View</strong> is for detailed layouts, operational documents, and materials you'd only share with a qualified client or confirmed partner — not the general public.
+                  <p className="text-xs text-zinc-500 leading-relaxed">
+                    Each layer has a separate, shareable URL. Share <strong className="font-medium text-slate-700">/private</strong> with qualified clients and <strong className="font-medium text-slate-700">/internal</strong> only with your team.
                   </p>
                 </div>
               </div>
@@ -280,7 +328,6 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
                     {health.passed}/{health.total}
                   </span>
                 </div>
-                {/* Progress bar */}
                 <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden mb-4">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
@@ -289,29 +336,16 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
                     style={{ width: `${(health.passed / health.total) * 100}%` }}
                   />
                 </div>
-                {/* Checklist */}
                 <div className="space-y-2">
                   {health.checks.map(c => (
                     <div key={c.label} className="flex items-center gap-2.5">
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                        c.ok ? 'bg-emerald-100' : 'bg-zinc-100'
-                      }`}>
-                        {c.ok
-                          ? <svg className="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                          : <div className="w-1.5 h-1.5 rounded-full bg-zinc-300" />
-                        }
-                      </div>
+                      <CheckDot ok={c.ok} />
                       <span className={`text-xs ${c.ok ? 'text-slate-600' : 'text-zinc-400'}`}>{c.label}</span>
                     </div>
                   ))}
                   {health.optional.map(c => (
                     <div key={c.label} className="flex items-center gap-2.5 opacity-60">
-                      <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
-                        {c.ok
-                          ? <svg className="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                          : <div className="w-1.5 h-1.5 rounded-full bg-zinc-300" />
-                        }
-                      </div>
+                      <CheckDot ok={c.ok} />
                       <span className="text-xs text-zinc-400">{c.label} <span className="text-zinc-300">· optional</span></span>
                     </div>
                   ))}
@@ -369,17 +403,12 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
               <div className="px-5 pt-5 pb-3">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-sm font-semibold text-slate-800">Sections</h2>
-                  <button
-                    onClick={() => onNavigate('builder')}
-                    className="text-xs text-zinc-400 hover:text-slate-600 transition"
-                  >
+                  <button onClick={() => onNavigate('builder')} className="text-xs text-zinc-400 hover:text-slate-600 transition">
                     Edit →
                   </button>
                 </div>
                 {sections.length === 0 ? (
-                  <p className="text-xs text-zinc-400 italic py-2">
-                    No sections yet — add assets to build your guide.
-                  </p>
+                  <p className="text-xs text-zinc-400 italic py-2">No sections yet — add assets to build your guide.</p>
                 ) : (
                   <div className="space-y-2">
                     {sections.map(s => {
@@ -415,5 +444,31 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
         </div>
       </div>
     </div>
+  )
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function CheckDot({ ok }) {
+  return (
+    <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${ok ? 'bg-emerald-100' : 'bg-zinc-100'}`}>
+      {ok
+        ? <svg className="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+        : <div className="w-1.5 h-1.5 rounded-full bg-zinc-300" />
+      }
+    </div>
+  )
+}
+
+function EyeIcon({ show }) {
+  return show ? (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+    </svg>
+  ) : (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
   )
 }

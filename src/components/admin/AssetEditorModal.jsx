@@ -8,7 +8,7 @@ const emptyAsset = {
   url:         '',
   description: '',
   category:    'Main Tour',
-  visibility:  'both',
+  visibility:  'public',
   status:      'ready',
   featured:    false,
 }
@@ -33,9 +33,9 @@ const inputCls = 'w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.
 const labelCls = 'block text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1.5'
 
 const VIS_STYLES = {
-  both:   { active: 'border-slate-800 bg-slate-50 ring-1 ring-slate-300',   label: 'text-slate-800' },
-  sales:  { active: 'border-sky-400   bg-sky-50   ring-1 ring-sky-300',     label: 'text-sky-800'   },
-  vetted: { active: 'border-amber-400 bg-amber-50 ring-1 ring-amber-300',   label: 'text-amber-800' },
+  public:   { active: 'border-sky-400   bg-sky-50   ring-1 ring-sky-300',   label: 'text-sky-800'   },
+  private:  { active: 'border-amber-400 bg-amber-50 ring-1 ring-amber-300', label: 'text-amber-800' },
+  internal: { active: 'border-red-400   bg-red-50   ring-1 ring-red-300',   label: 'text-red-800'   },
 }
 
 export default function AssetEditorModal({ asset, prefillCategory, onSave, onCancel }) {
@@ -196,12 +196,20 @@ export default function AssetEditorModal({ asset, prefillCategory, onSave, onCan
                 )
               })}
             </div>
-            {form.visibility === 'vetted' && (
+            {form.visibility === 'private' && (
               <div className="mt-2 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
                 <svg className="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                 </svg>
-                <p className="text-xs text-amber-800">Only visible to users with the Vetted View access code.</p>
+                <p className="text-xs text-amber-800">Only visible to users who have unlocked the Private layer.</p>
+              </div>
+            )}
+            {form.visibility === 'internal' && (
+              <div className="mt-2 flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5">
+                <svg className="w-3.5 h-3.5 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                <p className="text-xs text-red-800">Internal only — restricted to authorised team members. Do not use for client-facing content.</p>
               </div>
             )}
           </div>

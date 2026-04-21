@@ -3,7 +3,7 @@ import AssetEditorModal from './AssetEditorModal'
 import { TYPE_CONFIG, VISIBILITY_CONFIG, getSections, getSectionOrder, nextAssetId } from '../../lib/guideUtils'
 
 // ─── Visibility cycle ─────────────────────────────────────────────────────────
-const VIS_CYCLE = ['both', 'sales', 'vetted']
+const VIS_CYCLE = ['public', 'private', 'internal']
 
 // ─── Filter options ───────────────────────────────────────────────────────────
 const TYPE_FILTERS = [
@@ -16,10 +16,10 @@ const TYPE_FILTERS = [
 ]
 
 const VIS_FILTERS = [
-  { value: '',       label: 'All'          },
-  { value: 'both',   label: 'Sales+Vetted' },
-  { value: 'sales',  label: 'Sales Only'   },
-  { value: 'vetted', label: 'Vetted Only'  },
+  { value: '',         label: 'All'      },
+  { value: 'public',   label: 'Public'   },
+  { value: 'private',  label: 'Private'  },
+  { value: 'internal', label: 'Internal' },
 ]
 
 // ─── Inline visibility badge ──────────────────────────────────────────────────
@@ -59,11 +59,13 @@ function StatusBadge({ status, onClick }) {
 // ─── Section visibility summary ───────────────────────────────────────────────
 
 function sectionSummary(assets) {
-  const salesCount  = assets.filter(a => a.visibility === 'both' || a.visibility === 'sales').length
-  const vettedCount = assets.filter(a => a.visibility === 'vetted').length
+  const pub  = assets.filter(a => a.visibility === 'public').length
+  const priv = assets.filter(a => a.visibility === 'private').length
+  const int  = assets.filter(a => a.visibility === 'internal').length
   const parts = []
-  if (salesCount  > 0) parts.push(`${salesCount} Sales`)
-  if (vettedCount > 0) parts.push(`${vettedCount} Vetted`)
+  if (pub  > 0) parts.push(`${pub} Public`)
+  if (priv > 0) parts.push(`${priv} Private`)
+  if (int  > 0) parts.push(`${int} Internal`)
   return parts.join(' · ')
 }
 
@@ -182,8 +184,9 @@ export default function AssetsTab({ guide, setGuide }) {
 
   // Stats
   const totalAssets   = guide.assets.length
-  const salesCount    = guide.assets.filter(a => a.visibility === 'both' || a.visibility === 'sales').length
-  const vettedCount   = guide.assets.filter(a => a.visibility === 'vetted').length
+  const publicCount   = guide.assets.filter(a => a.visibility === 'public').length
+  const privateCount  = guide.assets.filter(a => a.visibility === 'private').length
+  const internalCount = guide.assets.filter(a => a.visibility === 'internal').length
   const missingUrl    = guide.assets.filter(a => !a.url?.trim()).length
   const isFiltering   = !!(search || typeFilter || visFilter)
 
@@ -201,9 +204,12 @@ export default function AssetsTab({ guide, setGuide }) {
                 : <>
                     <span className="font-medium text-slate-700">{totalAssets}</span> asset{totalAssets !== 1 ? 's' : ''}
                     {' · '}
-                    <span className="text-sky-600 font-medium">{salesCount} Sales</span>
+                    <span className="text-sky-600 font-medium">{publicCount} Public</span>
                     {' · '}
-                    <span className="text-amber-600 font-medium">+{vettedCount} Vetted</span>
+                    <span className="text-amber-600 font-medium">{privateCount} Private</span>
+                    {internalCount > 0 && (
+                      <span className="text-red-600 font-medium"> · {internalCount} Internal</span>
+                    )}
                     {missingUrl > 0 && (
                       <span className="text-orange-600 font-medium"> · {missingUrl} missing source URL</span>
                     )}

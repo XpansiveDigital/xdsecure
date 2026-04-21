@@ -46,23 +46,36 @@ export const TYPE_CONFIG = {
 }
 
 // ─── Visibility config ────────────────────────────────────────────────────────
+// Reflects the 3-layer cascade: public → private → internal
 
 export const VISIBILITY_CONFIG = {
-  both: {
-    label: 'Sales + Vetted',
-    short: 'Both',
-    pill:  'bg-slate-100 text-slate-600 border border-slate-200',
-  },
-  sales: {
-    label: 'Sales Only',
-    short: 'Sales',
+  public: {
+    label: 'Public',
+    short: 'Public',
     pill:  'bg-sky-50 text-sky-700 border border-sky-200',
   },
-  vetted: {
-    label: 'Vetted Access',
-    short: 'Vetted',
+  private: {
+    label: 'Private',
+    short: 'Private',
     pill:  'bg-amber-50 text-amber-700 border border-amber-200',
   },
+  internal: {
+    label: 'Internal',
+    short: 'Internal',
+    pill:  'bg-red-50 text-red-700 border border-red-200',
+  },
+}
+
+// ─── Layer filter helper ──────────────────────────────────────────────────────
+// Returns which assets are visible at a given layer (cascade model).
+
+export function getLayerAssets(assets, layer) {
+  switch (layer) {
+    case 'public':   return (assets || []).filter(a => a.visibility === 'public')
+    case 'private':  return (assets || []).filter(a => a.visibility === 'public' || a.visibility === 'private')
+    case 'internal': return assets || []
+    default:         return (assets || []).filter(a => a.visibility === 'public')
+  }
 }
 
 // ─── Section helpers ──────────────────────────────────────────────────────────
@@ -87,7 +100,6 @@ export function getSections(guide) {
     if (!grouped[asset.category]) grouped[asset.category] = []
     grouped[asset.category].push(asset)
   }
-  // Sections in sectionOrder, then any stray categories
   const all = [...order]
   for (const cat of Object.keys(grouped)) {
     if (!all.includes(cat)) all.push(cat)
@@ -100,22 +112,19 @@ export function getSections(guide) {
 // ─── Guide stats ──────────────────────────────────────────────────────────────
 
 export function getGuideStats(guide) {
-  const assets = guide.assets || []
-  const salesAssets  = assets.filter(a => a.visibility === 'both' || a.visibility === 'sales')
-  const vettedOnly   = assets.filter(a => a.visibility === 'vetted')
-  const bothAssets   = assets.filter(a => a.visibility === 'both')
-  const sections     = [...new Set(assets.map(a => a.category))]
+  const assets   = guide.assets || []
+  const sections = [...new Set(assets.map(a => a.category))]
   return {
     total:      assets.length,
-    sales:      salesAssets.length,
-    vetted:     vettedOnly.length,
-    both:       bothAssets.length,
+    public:     assets.filter(a => a.visibility === 'public').length,
+    private:    assets.filter(a => a.visibility === 'private').length,
+    internal:   assets.filter(a => a.visibility === 'internal').length,
     sections:   sections.length,
     readyCount: assets.filter(a => a.status === 'ready').length,
   }
 }
 
-// ─── Asset guide mutations ────────────────────────────────────────────────────
+// ─── Asset ID generator ───────────────────────────────────────────────────────
 
 let _nextId = 100
 export function nextAssetId() {
