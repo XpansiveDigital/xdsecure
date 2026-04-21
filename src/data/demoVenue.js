@@ -20,7 +20,7 @@ export const demoVenue = {
   publishStatus: "draft", // 'draft' | 'published'
   lastUpdated:   "21 April 2026",
   sectionOrder: [
-    "Main Tour",
+    "Virtual Tours",
     "Floorplans",
     "Gallery",
     "Venue Details",
@@ -34,7 +34,7 @@ export const demoVenue = {
       url: "https://my.matterport.com/show/?m=SxQL3iGyvQk",
       description:
         "Full 3D walkthrough of the main event spaces. Ideal for early-stage client conversations.",
-      category: "Main Tour",
+      category: "Virtual Tours",
       visibility: "public",
       status: "ready",
       featured: true,
@@ -135,7 +135,7 @@ export const ASSET_TYPES = [
 ]
 
 export const ASSET_CATEGORIES = [
-  "Main Tour",
+  "Virtual Tours",
   "Floorplans",
   "Gallery",
   "Venue Details",
