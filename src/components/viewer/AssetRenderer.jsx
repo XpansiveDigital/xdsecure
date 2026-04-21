@@ -154,20 +154,6 @@ export default function AssetRenderer({ asset, layer }) {
           )}
         </div>
 
-        {/* Open in new tab */}
-        {asset.url && (
-          <a
-            href={asset.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white text-xs font-medium text-slate-500 hover:text-slate-800 hover:border-zinc-300 hover:bg-zinc-50 active:scale-[0.97] transition"
-          >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-            </svg>
-            Open
-          </a>
-        )}
       </div>
 
       {/* Content area */}
