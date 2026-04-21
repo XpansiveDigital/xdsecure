@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { getGuideStats, getSections } from '../../lib/guideUtils'
 
 // ─── Accent colour options ────────────────────────────────────────────────────
@@ -56,6 +56,8 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
   const [showPrivate,  setShowPrivate]  = useState(false)
   const [showInternal, setShowInternal] = useState(false)
   const [saved,        setSaved]        = useState(false)
+  const [logoError,    setLogoError]    = useState(false)
+  const fileInputRef = useRef(null)
 
   const stats    = getGuideStats(guide)
   const sections = getSections(guide)
@@ -69,6 +71,23 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
   function handleSave() {
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  function handleLogoUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoError(false)
+    const reader = new FileReader()
+    reader.onload = ev => update('logoUrl', ev.target.result)
+    reader.onerror = () => setLogoError(true)
+    reader.readAsDataURL(file)
+    // Reset input so the same file can be re-selected if needed
+    e.target.value = ''
+  }
+
+  function handleRemoveLogo() {
+    update('logoUrl', null)
+    setLogoError(false)
   }
 
   function handlePublishToggle() {
@@ -177,20 +196,73 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
               <div className="px-6 pb-6 space-y-5">
                 <div>
                   <label className={labelCls}>Venue Logo</label>
-                  <div className="border-2 border-dashed border-zinc-200 rounded-2xl p-7 flex items-center gap-5 bg-zinc-50 hover:bg-zinc-100 hover:border-zinc-300 transition cursor-pointer group">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center shrink-0 group-hover:shadow-md transition">
-                      <svg className="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-                      </svg>
+
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+
+                  {guide.logoUrl ? (
+                    /* ── Logo preview ── */
+                    <div className="border border-zinc-200 rounded-2xl p-5 bg-zinc-50 flex items-center gap-4">
+                      <div className="h-12 flex items-center justify-center bg-white border border-zinc-200 rounded-xl px-4 shadow-sm shrink-0">
+                        <img
+                          src={guide.logoUrl}
+                          alt="Venue logo"
+                          className="h-8 max-w-[140px] object-contain"
+                          onError={() => setLogoError(true)}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-700">Logo uploaded</p>
+                        <p className="text-xs text-zinc-400 mt-0.5">Shown in the guide header.</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="text-xs text-zinc-500 bg-white border border-zinc-200 rounded-lg px-3 py-1.5 font-medium hover:border-zinc-300 hover:bg-zinc-50 transition"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleRemoveLogo}
+                          className="text-xs text-red-500 bg-white border border-red-100 rounded-lg px-3 py-1.5 font-medium hover:bg-red-50 transition"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-700">Upload your venue logo</p>
-                      <p className="text-xs text-zinc-400 mt-0.5">PNG, SVG or JPG · 200×60px recommended · Max 2MB</p>
-                    </div>
-                    <span className="text-xs text-zinc-500 bg-white border border-zinc-200 rounded-lg px-3 py-1.5 font-medium shrink-0">
-                      Choose file
-                    </span>
-                  </div>
+                  ) : (
+                    /* ── Upload area ── */
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full border-2 border-dashed border-zinc-200 rounded-2xl p-7 flex items-center gap-5 bg-zinc-50 hover:bg-zinc-100 hover:border-zinc-300 transition group text-left"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center shrink-0 group-hover:shadow-md transition">
+                        <svg className="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-slate-700">Upload your venue logo</p>
+                        <p className="text-xs text-zinc-400 mt-0.5">PNG, SVG, JPG or WebP · 200×60px recommended · Max 2MB</p>
+                      </div>
+                      <span className="text-xs text-zinc-500 bg-white border border-zinc-200 rounded-lg px-3 py-1.5 font-medium shrink-0 group-hover:border-zinc-300">
+                        Choose file
+                      </span>
+                    </button>
+                  )}
+
+                  {logoError && (
+                    <p className="mt-1.5 text-xs text-red-500">Couldn't load that image — try a different file.</p>
+                  )}
                 </div>
                 <div>
                   <label className={labelCls}>Accent Colour</label>
