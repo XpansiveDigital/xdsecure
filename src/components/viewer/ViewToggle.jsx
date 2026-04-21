@@ -1,12 +1,14 @@
-// ViewToggle: Sales View / Secure View tab switcher.
-// Adapts to dark header when Secure View is unlocked.
+// ViewToggle: Sales View / Vetted View tab switcher.
+// Adapts to dark header when Vetted View is unlocked.
 
 export default function ViewToggle({ activeView, onViewChange, isUnlocked }) {
   const dark = activeView === 'secure' && isUnlocked
 
   return (
     <div className={`flex items-center gap-0.5 rounded-xl p-1 transition-colors duration-300 ${
-      dark ? 'bg-slate-800' : 'bg-zinc-100'
+      dark
+        ? 'bg-white/[0.07] border border-white/[0.06]'
+        : 'bg-zinc-100/80'
     }`}>
 
       {/* Sales View */}
@@ -14,41 +16,43 @@ export default function ViewToggle({ activeView, onViewChange, isUnlocked }) {
         onClick={() => onViewChange('sales')}
         className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
           activeView === 'sales'
-            ? 'bg-white text-slate-900 shadow-sm'
+            ? dark
+              ? 'bg-white/10 text-white'
+              : 'bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.05)]'
             : dark
-              ? 'text-white/60 hover:text-white hover:bg-slate-700'
-              : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
+              ? 'text-white/45 hover:text-white/80 hover:bg-white/[0.06]'
+              : 'text-zinc-500 hover:text-slate-700 hover:bg-white/70'
         }`}
       >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
         </svg>
         Sales View
       </button>
 
-      {/* Secure View */}
+      {/* Vetted View */}
       <button
         onClick={() => onViewChange('secure')}
         className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
           activeView === 'secure'
             ? dark
-              ? 'bg-slate-600 text-white shadow-sm'
-              : 'bg-white text-slate-900 shadow-sm'
+              ? 'bg-white/10 text-white'
+              : 'bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.05)]'
             : dark
-              ? 'text-white/60 hover:text-white hover:bg-slate-700'
-              : 'text-zinc-500 hover:text-slate-700 hover:bg-zinc-50'
+              ? 'text-white/45 hover:text-white/80 hover:bg-white/[0.06]'
+              : 'text-zinc-500 hover:text-slate-700 hover:bg-white/70'
         }`}
       >
         {isUnlocked && activeView === 'secure' ? (
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         ) : (
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         )}
-        Secure View
+        Vetted View
       </button>
 
     </div>

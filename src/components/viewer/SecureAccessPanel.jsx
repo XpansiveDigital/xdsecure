@@ -34,7 +34,7 @@ export default function SecureAccessPanel({ correctPassword, accessCodeHint, onU
 
       {/* Radial glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-96 h-96 rounded-full bg-white/3 blur-3xl" />
+        <div className="w-[32rem] h-[32rem] rounded-full bg-white/[0.04] blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-sm">
@@ -52,10 +52,10 @@ export default function SecureAccessPanel({ correctPassword, accessCodeHint, onU
         </div>
 
         {/* Heading */}
-        <h2 className="text-center text-xl font-semibold text-white mb-2 tracking-tight">
+        <h2 className="text-center text-xl font-bold text-white mb-2 tracking-tight">
           Additional Detail Available
         </h2>
-        <p className="text-center text-sm text-white/40 mb-8 leading-relaxed px-4">
+        <p className="text-center text-sm text-white/38 mb-8 leading-relaxed px-4">
           Access more detailed venue information shared selectively with qualified clients and partners.
         </p>
 
@@ -107,7 +107,7 @@ export default function SecureAccessPanel({ correctPassword, accessCodeHint, onU
         </form>
 
         {/* Footer */}
-        <p className="text-center text-xs text-white/22 mt-6 leading-relaxed">
+        <p className="text-center text-xs text-white/30 mt-6 leading-relaxed">
           {accessCodeHint || "Don't have an access code? Contact your venue representative."}
         </p>
 

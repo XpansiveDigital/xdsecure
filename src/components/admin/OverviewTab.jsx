@@ -45,7 +45,7 @@ function sectionVisLabel(assets) {
 
 const inputCls = 'w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-slate-900/15 focus:border-slate-400 transition'
 const labelCls = 'block text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1.5'
-const cardCls  = 'bg-white rounded-2xl border border-zinc-200 shadow-sm'
+const cardCls  = 'bg-white rounded-2xl border border-zinc-200/70 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)]'
 
 // ─── OverviewTab ──────────────────────────────────────────────────────────────
 
@@ -91,20 +91,20 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
           <div className="flex items-center gap-2">
             <button
               onClick={handleSave}
-              className={`px-4 py-2 rounded-xl text-sm font-medium border transition shadow-sm ${
+              className={`px-4 py-2 rounded-xl text-sm font-medium border transition active:scale-[0.98] ${
                 saved
                   ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-white text-slate-700 border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
+                  : 'bg-white text-slate-700 border-zinc-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:border-zinc-300 hover:bg-zinc-50'
               }`}
             >
               {saved ? '✓ Saved' : 'Save Draft'}
             </button>
             <button
               onClick={handlePublishToggle}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition active:scale-[0.98] ${
                 isPublished
-                  ? 'bg-white text-slate-700 border border-zinc-200 hover:bg-zinc-50'
-                  : 'bg-slate-900 text-white hover:bg-slate-700'
+                  ? 'bg-white text-slate-700 border border-zinc-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:bg-zinc-50'
+                  : 'bg-slate-900 text-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] hover:bg-slate-800'
               }`}
             >
               {isPublished ? 'Unpublish' : 'Publish Guide'}
@@ -345,12 +345,12 @@ export default function OverviewTab({ guide, setGuide, onNavigate }) {
                 </div>
                 <button
                   onClick={handlePublishToggle}
-                  className={`w-full py-2.5 rounded-xl text-sm font-semibold transition ${
+                  className={`w-full py-2.5 rounded-xl text-sm font-semibold transition active:scale-[0.99] ${
                     isPublished
                       ? 'bg-white text-slate-600 border border-zinc-200 hover:bg-zinc-50'
                       : health.passed < health.total
-                        ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                        : 'bg-slate-900 text-white hover:bg-slate-700'
+                        ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200'
+                        : 'bg-slate-900 text-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] hover:bg-slate-800'
                   }`}
                   title={!isPublished && health.passed < health.total ? 'Complete the guide health checklist first' : undefined}
                 >

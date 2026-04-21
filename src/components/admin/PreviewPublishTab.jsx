@@ -46,7 +46,7 @@ export default function PreviewPublishTab({ guide, setGuide }) {
     <div className="h-full flex overflow-hidden">
 
       {/* ── Left sidebar: Publish controls ── */}
-      <div className="w-72 shrink-0 border-r border-zinc-200 bg-white overflow-y-auto flex flex-col">
+      <div className="w-72 shrink-0 border-r border-zinc-200/80 bg-white overflow-y-auto flex flex-col scrollbar-thin">
 
         {/* Header */}
         <div className="px-5 py-5 border-b border-zinc-100">
@@ -77,12 +77,12 @@ export default function PreviewPublishTab({ guide, setGuide }) {
             <button
               onClick={handlePublishToggle}
               disabled={!isPublished && !allPassed}
-              className={`w-full py-2.5 rounded-xl text-sm font-semibold transition ${
+              className={`w-full py-2.5 rounded-xl text-sm font-semibold transition active:scale-[0.99] ${
                 isPublished
                   ? 'bg-white border border-zinc-200 text-slate-700 hover:bg-zinc-50'
                   : allPassed
-                    ? 'bg-slate-900 text-white hover:bg-slate-700 shadow-sm'
-                    : 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
+                    ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-[0_1px_2px_rgba(0,0,0,0.12)]'
+                    : 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200'
               }`}
             >
               {isPublished ? 'Unpublish Guide' : 'Publish Guide'}

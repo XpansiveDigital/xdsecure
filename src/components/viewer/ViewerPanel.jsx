@@ -86,9 +86,9 @@ export default function ViewerPanel({ guide, embedded }) {
         ) : (
           <>
             {/* Sidebar nav */}
-            <aside className={`w-60 shrink-0 border-r overflow-y-auto transition-colors duration-300 ${
+            <aside className={`w-60 shrink-0 border-r overflow-y-auto scrollbar-thin transition-colors duration-300 ${
               isSecureMode
-                ? 'bg-slate-950 border-slate-800'
+                ? 'bg-slate-950 border-white/[0.07]'
                 : 'bg-white border-zinc-200'
             }`}>
               <AssetNavigation

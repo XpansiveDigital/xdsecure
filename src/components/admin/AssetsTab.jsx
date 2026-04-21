@@ -213,7 +213,7 @@ export default function AssetsTab({ guide, setGuide }) {
           </div>
           <button
             onClick={() => handleAdd()}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-700 transition shadow-sm shrink-0"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 active:scale-[0.98] transition shadow-[0_1px_2px_rgba(0,0,0,0.12)] shrink-0"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -236,7 +236,7 @@ export default function AssetsTab({ guide, setGuide }) {
 
         {/* ── Filter bar ── */}
         {totalAssets > 0 && (
-          <div className="bg-white border border-zinc-200 rounded-2xl px-4 py-3 mb-5 flex items-center gap-3 flex-wrap shadow-sm">
+          <div className="bg-white border border-zinc-200/70 rounded-2xl px-4 py-3 mb-5 flex items-center gap-3 flex-wrap shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)]">
             <div className="relative flex-1 min-w-40">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -300,7 +300,7 @@ export default function AssetsTab({ guide, setGuide }) {
 
         {/* ── Filtered empty state ── */}
         {totalAssets > 0 && groupedSections.length === 0 && (
-          <div className="bg-white border border-zinc-200 rounded-2xl shadow-sm py-12 text-center">
+          <div className="bg-white border border-zinc-200/70 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] py-12 text-center">
             <p className="text-sm font-medium text-zinc-500 mb-1">No assets match your filters</p>
             <p className="text-xs text-zinc-400">Try adjusting the search or filter options above.</p>
           </div>
@@ -314,7 +314,7 @@ export default function AssetsTab({ guide, setGuide }) {
               const summary     = sectionSummary(section.assets)
               const hasMissing  = section.assets.some(a => !a.url?.trim())
               return (
-                <div key={section.category} className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+                <div key={section.category} className="bg-white rounded-2xl border border-zinc-200/70 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden">
 
                   {/* Section header */}
                   <button
@@ -505,7 +505,7 @@ function GlobalEmptyState({ onAdd }) {
     { label: 'Video',           icon: 'M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z', cls: 'bg-rose-100 text-rose-600' },
   ]
   return (
-    <div className="bg-white border border-zinc-200 rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-white border border-zinc-200/70 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden">
       <div className="px-8 py-10 text-center border-b border-zinc-100">
         <div className="flex items-center justify-center gap-3 mb-5">
           {TYPES.map(t => (
@@ -522,7 +522,7 @@ function GlobalEmptyState({ onAdd }) {
         </p>
         <button
           onClick={onAdd}
-          className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-700 transition shadow-sm"
+          className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 active:scale-[0.98] transition shadow-[0_1px_2px_rgba(0,0,0,0.12)]"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

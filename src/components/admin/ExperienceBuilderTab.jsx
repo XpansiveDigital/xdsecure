@@ -119,7 +119,7 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
               { icon: '★', label: 'Feature assets',    desc: 'Star an asset to surface it first in the guide' },
               { icon: '◎', label: 'Control visibility', desc: 'Click any visibility badge to cycle it' },
             ].map(h => (
-              <div key={h.label} className="bg-white border border-zinc-200 rounded-xl px-4 py-3">
+              <div key={h.label} className="bg-white border border-zinc-200/70 rounded-xl px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
                 <p className="text-[11px] font-bold text-slate-700 mb-0.5">{h.label}</p>
                 <p className="text-[11px] text-zinc-400 leading-relaxed">{h.desc}</p>
               </div>
@@ -144,7 +144,7 @@ export default function ExperienceBuilderTab({ guide, setGuide }) {
                 const isLast    = sIdx === sections.length - 1
 
                 return (
-                  <div key={section.category} className="bg-white border border-zinc-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div key={section.category} className="bg-white border border-zinc-200/70 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden">
 
                     {/* Section header */}
                     <div className="flex items-center gap-3 px-5 py-3.5 bg-zinc-50 border-b border-zinc-200">
