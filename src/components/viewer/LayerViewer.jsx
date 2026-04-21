@@ -1,6 +1,18 @@
 import { useState, useEffect } from 'react'
 import { demoVenue }     from '../../data/demoVenue'
 import { getLayerAssets, getSections, TYPE_CONFIG } from '../../lib/guideUtils'
+
+// ─── Load persisted guide (falls back to demo data) ───────────────────────────
+
+const STORAGE_KEY = 'xd_guide_v1'
+
+function loadGuide() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) return { ...demoVenue, ...JSON.parse(saved) }
+  } catch {}
+  return demoVenue
+}
 import AccessGate        from './AccessGate'
 import AssetNavigation   from './AssetNavigation'
 import AssetRenderer     from './AssetRenderer'
@@ -46,7 +58,7 @@ const LAYER_CONFIG = {
 // ─── LayerViewer ──────────────────────────────────────────────────────────────
 
 export default function LayerViewer({ layer = 'public' }) {
-  const guide  = demoVenue
+  const guide  = loadGuide()
   const config = LAYER_CONFIG[layer] || LAYER_CONFIG.public
   const dark   = config.dark
 

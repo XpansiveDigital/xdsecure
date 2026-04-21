@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import OverviewTab        from './admin/OverviewTab'
 import AssetsTab          from './admin/AssetsTab'
 import ExperienceBuilderTab from './admin/ExperienceBuilderTab'
@@ -48,11 +48,30 @@ const ADMIN_TABS = [
   },
 ]
 
+// ─── Persistence ─────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'xd_guide_v1'
+
+function loadGuide() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) return { ...demoVenue, ...JSON.parse(saved) }
+  } catch {}
+  return demoVenue
+}
+
+function saveGuide(guide) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(guide)) } catch {}
+}
+
 // ─── AppShell ─────────────────────────────────────────────────────────────────
 
 export default function AppShell() {
   const [activeTab, setActiveTab] = useState('overview')
-  const [guide, setGuide] = useState(demoVenue)
+  const [guide, setGuide] = useState(loadGuide)
+
+  // Persist every change to localStorage
+  useEffect(() => { saveGuide(guide) }, [guide])
 
   return (
     <div className="min-h-screen flex flex-col bg-stone-50">
